@@ -1,0 +1,14 @@
+{
+  "services": [
+    { "id": 1, "name": "Seneau" },
+    { "id": 2, "name": "Orange" },
+    { "id": 3, "name": "Senelec" },
+    { "id": 4, "name": "Bank of Senegal" }
+  ],
+  "localisations": {
+    "Seneau": ["Dakar Plateau", "Guédiawaye"],
+    "Orange": ["Dakar Yoff", "Pikine"],
+    "Senelec": ["Thiès", "Saint-Louis"],
+    "Bank of Senegal": ["Ziguinchor", "Kaolack"]
+  }
+}
