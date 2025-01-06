@@ -1,4 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<%@ include file="header.jsp" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -22,43 +24,64 @@
             text-align: center;
             color: #333;
         }
-        label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 10px;
+        .services, .localisations, .agencies {
+            margin-top: 20px;
         }
-        select, button {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
-        button {
+        .button {
+            display: inline-block;
+            margin: 5px;
+            padding: 10px 20px;
             background-color: #007bff;
             color: white;
-            border: none;
+            text-decoration: none;
+            border-radius: 4px;
             cursor: pointer;
         }
-        button:hover {
+        .button:hover {
             background-color: #0056b3;
+        }
+        .hidden {
+            display: none;
         }
     </style>
     <script>
-        const localisations = ${localisations};
+        // Localisations et agences
+        // Données dynamiques simulées
+        const localisations = JSON.parse(${localisations});
+        const agencies = JSON.parse(${agencies});
+        const clients = JSON.parse(${clients});
 
-        console.log(localisations)
+        function showLocalisations(serviceName) {
+            const localisationContainer = document.getElementById("localisation-container");
+            localisationContainer.innerHTML = ""; // Réinitialiser la liste des localisations
+            localisationContainer.classList.remove("hidden");
 
-        function updateLocalisations() {
-            const service = document.getElementById("service").value;
-            const localisationSelect = document.getElementById("localisation");
-            localisationSelect.innerHTML = "<option value=''>-- Sélectionnez une localisation --</option>";
-            if (localisations[service]) {
-                localisations[service].forEach(localisation => {
-                    const option = document.createElement("option");
-                    option.value = localisation;
-                    option.textContent = localisation;
-                    localisationSelect.appendChild(option);
+            if (localisations[serviceName]) {
+                localisations[serviceName].forEach(localisation => {
+                    const button = document.createElement("button");
+                    button.className = "button";
+                    button.textContent = localisation;
+                    button.onclick = function () {
+                        showAgencies(localisation);
+                    };
+                    localisationContainer.appendChild(button);
                 });
+            }
+        }
+
+        function showAgencies(localisationName) {
+            const agencyContainer = document.getElementById("agency-container");
+            agencyContainer.innerHTML = ""; // Réinitialiser la liste des agences
+            agencyContainer.classList.remove("hidden");
+
+            if (agencies[localisationName]) {
+                agencies[localisationName].forEach(agency => {
+                    const div = document.createElement("div");
+                    div.textContent = `Agence : ${agency}`;
+                    agencyContainer.appendChild(div);
+                });
+            } else {
+                agencyContainer.innerHTML = "<p>Aucune agence trouvée pour cette localisation.</p>";
             }
         }
     </script>
@@ -66,22 +89,22 @@
 <body>
 <div class="container">
     <h1>Portail Client</h1>
-    <form method="post" action="/select">
-        <label for="service">Sélectionnez un service :</label>
-        <select name="service" id="service" onchange="updateLocalisations()">
-            <option value=''>-- Sélectionnez un service --</option>
-            <c:forEach var="service" items="${services}">
-                <option value="${service.name}">${service.name}</option>
-            </c:forEach>
-        </select>
-
-        <label for="localisation">Sélectionnez une localisation :</label>
-        <select name="localisation" id="localisation">
-            <option value="">-- Sélectionnez une localisation --</option>
-        </select>
-
-        <button type="submit">Obtenir un ticket</button>
-    </form>
+    <div class="services">
+        <h2>Services disponibles :</h2>
+        <c:forEach var="service" items="${services}">
+            <button class="button" onclick="showLocalisations('${service.name}')">
+                    ${service.name}
+            </button>
+        </c:forEach>
+    </div>
+    <div id="localisation-container" class="localisations hidden">
+        <h2>Localisations :</h2>
+        <!-- Les localisations seront ajoutées dynamiquement ici -->
+    </div>
+    <div id="agency-container" class="agencies hidden">
+        <h2>Agences :</h2>
+        <!-- Les agences seront ajoutées dynamiquement ici -->
+    </div>
 </div>
 </body>
 </html>

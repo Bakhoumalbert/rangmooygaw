@@ -10,5 +10,36 @@
     "Orange": ["Dakar Yoff", "Pikine"],
     "Senelec": ["Thiès", "Saint-Louis"],
     "Bank of Senegal": ["Ziguinchor", "Kaolack"]
+  },
+  "agencies": {
+    "Dakar Plateau": ["Agence Centrale", "Agence Médina"],
+    "Guédiawaye": ["Agence Guédiawaye Nord", "Agence Guédiawaye Sud"],
+    "Dakar Yoff": ["Agence Yoff"],
+    "Pikine": ["Agence Pikine"],
+    "Thiès": ["Agence Thiès 1", "Agence Thiès 2"],
+    "Saint-Louis": ["Agence Saint-Louis Centre"],
+    "Ziguinchor": ["Agence Ziguinchor Nord", "Agence Ziguinchor Sud"],
+    "Kaolack": ["Agence Kaolack Centre"]
+  },
+  "clients": {
+    "Dakar Plateau": [
+      { "name": "Alioune Ndiaye", "number": 101, "position": 1 },
+      { "name": "Fatou Diop", "number": 102, "position": 2 },
+      { "name": "Cheikh Ba", "number": 103, "position": 3 }
+    ],
+    "Guédiawaye": [
+      { "name": "Awa Sow", "number": 201, "position": 1 },
+      { "name": "Oumar Sarr", "number": 202, "position": 2 }
+    ]
+  },
+  "ticketStatus": {
+    "Dakar Plateau": {
+      "lastIssued": 103,
+      "current": 101
+    },
+    "Guédiawaye": {
+      "lastIssued": 202,
+      "current": 201
+    }
   }
 }

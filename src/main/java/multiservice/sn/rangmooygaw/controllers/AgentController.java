@@ -1,7 +1,6 @@
 package multiservice.sn.rangmooygaw.controllers;
 
-import multiservice.sn.rangmooygaw.Application;
-import multiservice.sn.rangmooygaw.services.QueueService;
+import multiservice.sn.rangmooygaw.service.QueueService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;

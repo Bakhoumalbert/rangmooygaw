@@ -3,15 +3,13 @@ package multiservice.sn.rangmooygaw.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import multiservice.sn.rangmooygaw.config.JsonDataLoader;
-import multiservice.sn.rangmooygaw.modele.Queue;
-import multiservice.sn.rangmooygaw.services.QueueService;
-import org.springframework.stereotype.Controller;
+import multiservice.sn.rangmooygaw.service.QueueService;
+//import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
+@RequestMapping("/api")
 public class ClientController {
 
     private final QueueService queueService;
@@ -22,17 +20,30 @@ public class ClientController {
         this.jsonDataLoader = jsonDataLoader;
     }
 
-
 //    @GetMapping("/")
-//    public String showHome(Model model) {
-//        // Services disponibles
-//        model.addAttribute("services", queueService.getAllQueues().keySet());
+//    public String showHome(Model model) throws JsonProcessingException {
+//        model.addAttribute("services", jsonDataLoader.getServices());
+//        model.addAttribute("localisations", new ObjectMapper().writeValueAsString(jsonDataLoader.getLocalisations()));
 //        return "client_home";
 //    }
-    @GetMapping("/")
+
+//    @GetMapping("/")
+//    public String showHome(Model model) throws JsonProcessingException {
+//        ObjectMapper mapper = new ObjectMapper();
+//        model.addAttribute("services", jsonDataLoader.getServices());
+//        model.addAttribute("localisations", mapper.writeValueAsString(jsonDataLoader.getLocalisations()));
+//        model.addAttribute("agencies", mapper.writeValueAsString(jsonDataLoader.getAgencies()));
+//        model.addAttribute("clients", mapper.writeValueAsString(jsonDataLoader.getClients()));
+//        return "client_home";
+//    }
+
+    @GetMapping
     public String showHome(Model model) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
         model.addAttribute("services", jsonDataLoader.getServices());
-        model.addAttribute("localisations", new ObjectMapper().writeValueAsString(jsonDataLoader.getLocalisations()));
+        model.addAttribute("localisations", jsonDataLoader.getLocalisations());
+        model.addAttribute("agencies", objectMapper.writeValueAsString(jsonDataLoader.getAgencies()));
+        //model.addAttribute("clients", objectMapper.writeValueAsString(jsonDataLoader.getClients()));
         return "client_home";
     }
 

@@ -1,4 +1,4 @@
-package multiservice.sn.rangmooygaw.services;
+package multiservice.sn.rangmooygaw.service;
 
 import multiservice.sn.rangmooygaw.modele.Queue;
 import org.springframework.stereotype.Service;
