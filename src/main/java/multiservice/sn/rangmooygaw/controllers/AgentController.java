@@ -1,39 +1,25 @@
 package multiservice.sn.rangmooygaw.controllers;
 
-import multiservice.sn.rangmooygaw.service.QueueService;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import multiservice.sn.rangmooygaw.entite.Agent;
+import multiservice.sn.rangmooygaw.service.AgentService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/agents")
 public class AgentController {
+    @Autowired
+    private AgentService agentService;
 
-    private final QueueService queueService;
-
-    public AgentController(QueueService queueService) {
-        this.queueService = queueService;
+    @GetMapping
+    public List<Agent> getAllAgents() {
+        return agentService.getAllAgents();
     }
 
-    @GetMapping("/agent")
-    public String agentInterface(@RequestParam(value = "location", required = false) String location, Model model) {
-        if (location == null || location.isEmpty()) {
-            location = "Dakar Plateau"; // Localisation par défaut
-        }
-        model.addAttribute("location", location);
-        model.addAttribute("currentNumber", queueService.getQueue(location).getCurrentNumber());
-        model.addAttribute("queues", queueService.getAllQueues());
-        return "agent";
-    }
-
-    @PostMapping("/agent/{location}/next")
-    public String nextClient(@PathVariable String location, Model model) {
-        queueService.nextClient(location);
-        return "redirect:/agent?location=" + location;
-    }
-
-    @PostMapping("/agent/{location}/previous")
-    public String previousClient(@PathVariable String location, Model model) {
-        queueService.previousClient(location);
-        return "redirect:/agent?location=" + location;
+    @PostMapping
+    public Agent saveAgent(@RequestBody Agent agent) {
+        return agentService.saveAgent(agent);
     }
 }
