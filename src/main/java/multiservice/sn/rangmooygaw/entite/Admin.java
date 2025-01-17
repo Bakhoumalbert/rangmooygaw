@@ -18,7 +18,7 @@ public class Admin {
 
     // Getters et setters
 
-    public Long getId() {
+    public Long getIdAdmin() {
         return idAdmin;
     }
 
@@ -45,6 +45,8 @@ public class Admin {
     public List<FileAttente> getFilesAttente() {
         return filesAttente;
     }
+
+
 
     public void setFilesAttente(List<FileAttente> filesAttente) {
         this.filesAttente = filesAttente;

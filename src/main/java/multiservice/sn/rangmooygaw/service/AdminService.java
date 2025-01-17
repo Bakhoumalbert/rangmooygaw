@@ -1,6 +1,7 @@
 package multiservice.sn.rangmooygaw.service;
 
 import multiservice.sn.rangmooygaw.entite.Admin;
+import multiservice.sn.rangmooygaw.entite.Client;
 import multiservice.sn.rangmooygaw.repository.AdminRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

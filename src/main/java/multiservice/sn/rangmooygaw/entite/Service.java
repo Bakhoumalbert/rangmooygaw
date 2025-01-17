@@ -11,23 +11,23 @@ public class Service {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idService;
 
+    @Column(nullable = false, length = 100)
     private String nom;
+
+    @Column(length = 255)
     private String description;
 
-//    @OneToMany(mappedBy = "service")
-//    private List<FileAttente> filesAttente;
-
-    @OneToMany(mappedBy = "service", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FileAttente> filesAttente;
 
     // Getters et setters
 
 
-    public Long getId() {
+    public Long getIdService() {
         return idService;
     }
 
-    public void setId(Long id) {
+    public void setIdService(Long id) {
         this.idService = id;
     }
 

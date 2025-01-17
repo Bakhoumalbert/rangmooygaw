@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Vue Admin</title>
+    <title>Vue Admin - File d'Attente</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -50,8 +50,47 @@
 <body>
 <div class="container">
     <h1>Vue Admin</h1>
-    <c:out value="${fileAttente.idFileAttente}" />
+    <h2>Informations sur la File d'Attente</h2>
 
+    <!-- Tableau pour afficher dynamiquement les informations -->
+    <table id="fileAttenteTable">
+        <thead>
+        <tr>
+            <th>Service</th>
+            <th>Agence</th>
+            <th>Numéro en cours</th>
+            <th>Date de Création</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Les données seront ajoutées ici par le script -->
+        </tbody>
+    </table>
 </div>
+
+<script>
+    // Convertir les données JSON de la file d'attente
+    const fileAttente = JSON.parse('${fileAttente}');
+    console.log("File d'attente :", fileAttente);
+
+    // Référencer le tableau HTML
+    const tableBody = document.getElementById("fileAttenteTable").querySelector("tbody");
+
+    // Remplir le tableau avec les données
+    fileAttente.forEach(file => {
+        const row = document.createElement("tr");
+
+        // Colonnes du tableau
+        row.innerHTML = `
+            <td>${file.service.nom}</td>
+            <td>${file.agence.localisation}</td>
+            <td>${file.numeroEnCours}</td>
+            <td>${file.dateCreation}</td>
+        `;
+
+        // Ajouter la ligne au tableau
+        tableBody.appendChild(row);
+    });
+</script>
 </body>
 </html>
