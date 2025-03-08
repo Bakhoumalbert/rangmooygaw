@@ -1,14 +1,15 @@
 package multiservice.sn.rangmooygaw.entite;
 
 import jakarta.persistence.*;
-import multiservice.sn.rangmooygaw.entite.FileAttente;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Service {
+public class Services {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_service") // Assure-toi que le nom de colonne est correct
     private Long idService;
 
     @Column(nullable = false, length = 100)
@@ -18,11 +19,13 @@ public class Service {
     private String description;
 
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Ticket> tickets = new ArrayList<>();
+
+    @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FileAttente> filesAttente;
 
+
     // Getters et setters
-
-
     public Long getIdService() {
         return idService;
     }

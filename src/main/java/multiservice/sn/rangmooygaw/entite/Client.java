@@ -2,30 +2,33 @@ package multiservice.sn.rangmooygaw.entite;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idClient;
+    private Long id_client;
 
     private String nom;
     private String prenom;
     private String email;
     private String telephone;
 
-    @OneToMany(mappedBy = "client")
-    private List<Ticket> tickets;
+
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Ticket> tickets = new ArrayList<>();
+
 
     // Getters et setters
 
     public Long getId() {
-        return idClient;
+        return id_client;
     }
 
     public void setId(Long id) {
-        this.idClient = id;
+        this.id_client = id;
     }
 
     public String getNom() {

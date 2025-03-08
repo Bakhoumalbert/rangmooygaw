@@ -13,8 +13,8 @@ public class Admin {
     private String nom;
     private String email;
 
-    @OneToMany(mappedBy = "admin")
-    private List<FileAttente> filesAttente;
+//    @OneToMany(mappedBy = "admin")
+//    private List<FileAttente> filesAttente;
 
     // Getters et setters
 
@@ -42,14 +42,14 @@ public class Admin {
         this.email = email;
     }
 
-    public List<FileAttente> getFilesAttente() {
-        return filesAttente;
-    }
+//    public List<FileAttente> getFilesAttente() {
+//        return filesAttente;
+//    }
 
 
 
-    public void setFilesAttente(List<FileAttente> filesAttente) {
-        this.filesAttente = filesAttente;
-    }
+//    public void setFilesAttente(List<FileAttente> filesAttente) {
+//        this.filesAttente = filesAttente;
+//    }
 }
 

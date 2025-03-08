@@ -1,43 +1,28 @@
 package multiservice.sn.rangmooygaw.entite;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
 public class Agent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idAgent;
+    private Long id_agent;
 
     private String nom;
     private String email;
 
     @ManyToOne
-    @JoinColumn(name = "idAgence", insertable = false, updatable = false)
+    @JoinColumn(name = "id_agence", nullable = false) // Supprimé `insertable = false, updatable = false`
     private Agence agence;
 
-    @Column(name = "idAgence")
-    private Long idAgence;
-
-    // Méthodes spécifiques
-    public int voirNumeroEnCours(FileAttente fileAttente) {
-        return fileAttente.getNumeroEnCours();
+    // Getters et Setters
+    public Long getId_agent() {
+        return id_agent;
     }
 
-    public void suivantClient(FileAttente fileAttente) {
-        fileAttente.incrementerNumero();
-    }
-
-    public void precedentClient(FileAttente fileAttente) {
-        fileAttente.decrementerNumero();
-    }
-
-    // Getters et setters
-    public Long getIdAgent() {
-        return idAgent;
-    }
-
-    public void setIdAgent(Long idAgent) {
-        this.idAgent = idAgent;
+    public void setId_agent(Long idAgent) {
+        this.id_agent = idAgent;
     }
 
     public String getNom() {
@@ -63,12 +48,5 @@ public class Agent {
     public void setAgence(Agence agence) {
         this.agence = agence;
     }
-
-    public Long getIdAgence() {
-        return idAgence;
-    }
-
-    public void setIdAgence(Long idAgence) {
-        this.idAgence = idAgence;
-    }
 }
+

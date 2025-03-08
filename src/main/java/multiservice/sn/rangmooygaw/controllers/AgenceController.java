@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/agences")
+@RequestMapping("/agence")
 public class AgenceController {
     @Autowired
     private AgenceService agenceService;
@@ -22,5 +22,6 @@ public class AgenceController {
     public Agence saveAgence(@RequestBody Agence agence) {
         return agenceService.saveAgence(agence);
     }
+
 }
 

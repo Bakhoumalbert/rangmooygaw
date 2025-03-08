@@ -1,47 +1,80 @@
 package multiservice.sn.rangmooygaw.entite;
 
+
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idTicket;
-
-    private int numero;
-    private int position;
-    private int personnesDevant;
-    private int numeroActuel;
+    private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "file_attente_id")
+    @JoinColumn(name = "id_client") // Clé étrangère dans la table Ticket
+    private Client client;
+
+    @ManyToOne
+    @JoinColumn(name = "id_fille_attente")
     private FileAttente fileAttente;
 
     @ManyToOne
-    @JoinColumn(name = "client_id")
-    private Client client;
+    @JoinColumn(name = "id_service")
+    private Services service;
 
-    // Méthode pour générer un numéro
-    public void genererNumero() {
-        this.numero = (int) (Math.random() * 10000); // Exemple simple
-    }
+    @ManyToOne
+    @JoinColumn(name = "id_agence")
+    private Agence agence;
 
-    // Getters et setters
+    private int position; // Position dans la file
+
+    private boolean enCoursDeTraitement = false; // True si l'agent est en train de traiter ce ticket
+
+    private boolean traite = false; // True si le ticket a été traité
+
+    private LocalDateTime dateCreation = LocalDateTime.now();
+
+    // Getters & Setters
 
     public Long getId() {
-        return idTicket;
+        return id;
     }
 
     public void setId(Long id) {
-        this.idTicket = id;
+        this.id = id;
     }
 
-    public int getNumero() {
-        return numero;
+    public Client getClient() {
+        return client;
     }
 
-    public void setNumero(int numero) {
-        this.numero = numero;
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
+    public Services getServices() {
+        return service;
+    }
+
+    public void setServices(Services services) {
+        this.service = services;
+    }
+
+    public Services getService() {
+        return service;
+    }
+
+    public void setService(Services service) {
+        this.service = service;
+    }
+
+    public Agence getAgence() {
+        return agence;
+    }
+
+    public void setAgence(Agence agence) {
+        this.agence = agence;
     }
 
     public int getPosition() {
@@ -52,36 +85,27 @@ public class Ticket {
         this.position = position;
     }
 
-    public int getPersonnesDevant() {
-        return personnesDevant;
+    public boolean isEnCoursDeTraitement() {
+        return enCoursDeTraitement;
     }
 
-    public void setPersonnesDevant(int personnesDevant) {
-        this.personnesDevant = personnesDevant;
+    public void setEnCoursDeTraitement(boolean enCoursDeTraitement) {
+        this.enCoursDeTraitement = enCoursDeTraitement;
     }
 
-    public int getNumeroActuel() {
-        return numeroActuel;
+    public boolean isTraite() {
+        return traite;
     }
 
-    public void setNumeroActuel(int numeroActuel) {
-        this.numeroActuel = numeroActuel;
+    public void setTraite(boolean traite) {
+        this.traite = traite;
     }
 
-    public FileAttente getFileAttente() {
-        return fileAttente;
+    public LocalDateTime getDateCreation() {
+        return dateCreation;
     }
 
-    public void setFileAttente(FileAttente fileAttente) {
-        this.fileAttente = fileAttente;
-    }
-
-    public Client getClient() {
-        return client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
+    public void setDateCreation(LocalDateTime dateCreation) {
+        this.dateCreation = dateCreation;
     }
 }
-

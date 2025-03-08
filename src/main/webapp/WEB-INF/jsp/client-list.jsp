@@ -1,5 +1,4 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -53,10 +52,15 @@
             background-color: #f1f1f1;
         }
 
-        .add-client {
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px;
+        }
+
+        .buton {
             display: block;
-            width: 150px;
-            margin: 0 auto;
             text-align: center;
             padding: 10px 15px;
             background-color: #28a745;
@@ -66,8 +70,35 @@
             font-size: 16px;
         }
 
-        .add-client:hover {
+        .buton:hover {
             background-color: #218838;
+        }
+
+        .btn-edit {
+            background-color: #ffc107;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-right: 5px;
+        }
+
+        .btn-edit:hover {
+            background-color: #e0a800;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .btn-delete:hover {
+            background-color: #c82333;
         }
     </style>
 </head>
@@ -75,15 +106,19 @@
 <div class="container">
     <h1>Liste des Clients</h1>
 
-    <a href="/admin/create-client" class="add-client">+ Ajouter un Client</a>
+    <div class="nav">
+        <a href="/admin" class="buton">Accueil</a>
+        <a href="/admin/create-client" class="buton">+ Ajouter un Client</a>
+    </div>
+
     <table id="clientTable" border="1">
         <thead>
         <tr>
-            <th>ID</th>
             <th>Nom</th>
             <th>Prénom</th>
             <th>Email</th>
             <th>Téléphone</th>
+            <th>Actions</th>
         </tr>
         </thead>
         <tbody>
@@ -91,7 +126,7 @@
         </tbody>
     </table>
 
-    <!-- JavaScript en bas -->
+    <!-- JavaScript pour insérer les données -->
     <script>
         const clients = JSON.parse('${clients}');
         console.log("Clients :", clients);
@@ -100,9 +135,6 @@
         if (tableBody) {
             clients.forEach(client => {
                 const row = document.createElement("tr");
-
-                const idCell = document.createElement("td");
-                idCell.textContent = client.idClient;
 
                 const nomCell = document.createElement("td");
                 nomCell.textContent = client.nom;
@@ -116,11 +148,36 @@
                 const telephoneCell = document.createElement("td");
                 telephoneCell.textContent = client.telephone;
 
-                row.appendChild(idCell);
+                // Actions
+                const actionsCell = document.createElement("td");
+
+                // Bouton Modifier
+                const editButton = document.createElement("button");
+                editButton.textContent = "Modifier";
+                editButton.classList.add("btn-edit");
+                editButton.addEventListener("click", () => {
+                    window.location.href = "/admin/edit-client/" + client.id;
+                });
+                actionsCell.appendChild(editButton);
+
+                // Bouton Supprimer
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "Supprimer";
+                deleteButton.classList.add("btn-delete");
+                deleteButton.addEventListener("click", () => {
+                    if (confirm("Êtes-vous sûr de vouloir supprimer : " + client.nom +" ?")) {
+                        window.location.href = "/admin/delete-client/"+client.id;
+                    }
+                });
+                actionsCell.appendChild(deleteButton);
+
+
+
                 row.appendChild(nomCell);
                 row.appendChild(prenomCell);
                 row.appendChild(emailCell);
                 row.appendChild(telephoneCell);
+                row.appendChild(actionsCell);
 
                 tableBody.appendChild(row);
             });

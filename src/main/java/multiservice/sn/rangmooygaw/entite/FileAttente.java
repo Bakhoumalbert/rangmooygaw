@@ -1,9 +1,8 @@
 package multiservice.sn.rangmooygaw.entite;
 
 import jakarta.persistence.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -13,45 +12,33 @@ public class FileAttente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idFileAttente;
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date dateCreation;
 
-    @Column(nullable = false)
-    private int numeroEnCours;
+    private int numeroEnCours = 0; // Numéro actuellement en traitement
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "idService", nullable = false)
-    private Service service;
+    @ManyToOne
+    @JoinColumn(name = "id_service", nullable = false)
+    private Services service;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "idAgence", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "id_agence", nullable = false)
     private Agence agence;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "idAdmin", nullable = false)
-    private Admin admin;
-
     @OneToMany(mappedBy = "fileAttente", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Ticket> tickets;
-    // Méthodes spécifiques
-    public void incrementerNumero() {
-        this.numeroEnCours++;
+    private List<Ticket> tickets = new ArrayList<>();
+
+    // Générer un nouveau numéro de ticket
+    public int genererTicket() {
+        return tickets.size() + 1;
     }
 
-    public void decrementerNumero() {
-        if (this.numeroEnCours > 0) {
-            this.numeroEnCours--;
-        }
-    }
-
-    // Getters et setters
-
-    public Long getIdFileAttente() {
+    public Long getId() {
         return idFileAttente;
     }
 
-    public void setIdFileAttente(Long idFileAttente) {
-        this.idFileAttente = idFileAttente;
+    public void setId(Long id) {
+        this.idFileAttente = id;
     }
 
     public Date getDateCreation() {
@@ -70,11 +57,11 @@ public class FileAttente {
         this.numeroEnCours = numeroEnCours;
     }
 
-    public Service getService() {
+    public Services getService() {
         return service;
     }
 
-    public void setService(Service service) {
+    public void setService(Services service) {
         this.service = service;
     }
 
@@ -86,14 +73,6 @@ public class FileAttente {
         this.agence = agence;
     }
 
-    public Admin getAdmin() {
-        return admin;
-    }
-
-    public void setAdmin(Admin admin) {
-        this.admin = admin;
-    }
-
     public List<Ticket> getTickets() {
         return tickets;
     }
@@ -102,16 +81,17 @@ public class FileAttente {
         this.tickets = tickets;
     }
 
-    // Méthode toString pour débogage
-    @Override
-    public String toString() {
-        return "FileAttente{" +
-                "idFileAttente=" + idFileAttente +
-                ", dateCreation=" + dateCreation +
-                ", numeroEnCours=" + numeroEnCours +
-                ", service=" + (service != null ? service.getNom() : "null") +
-                ", agence=" + (agence != null ? agence.getLocalisation() : "null") +
-                ", admin=" + (admin != null ? admin.getNom() : "null") +
-                '}';
+    public String getIdFileAttente() {
+        return idFileAttente.toString();
+    }
+
+    public void incrementerNumero() {
+        this.numeroEnCours++;
+    }
+
+    public void decrementerNumero() {
+        if (this.numeroEnCours > 0) {
+            this.numeroEnCours--;
+        }
     }
 }
