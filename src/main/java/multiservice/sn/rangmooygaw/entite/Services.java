@@ -1,17 +1,23 @@
 package multiservice.sn.rangmooygaw.entite;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 public class Services {
+    // Getters et setters
+    @Setter
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_service") // Assure-toi que le nom de colonne est correct
     private Long idService;
 
+    @Getter
     @Column(nullable = false, length = 100)
     private String nom;
 
@@ -24,19 +30,9 @@ public class Services {
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FileAttente> filesAttente;
 
+    @ManyToMany(mappedBy = "services")
+    private List<Agence> agences = new ArrayList<>();
 
-    // Getters et setters
-    public Long getIdService() {
-        return idService;
-    }
-
-    public void setIdService(Long id) {
-        this.idService = id;
-    }
-
-    public String getNom() {
-        return nom;
-    }
 
     public void setNom(String nom) {
         this.nom = nom;

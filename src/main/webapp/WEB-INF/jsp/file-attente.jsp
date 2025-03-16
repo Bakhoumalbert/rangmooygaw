@@ -1,64 +1,34 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>Bienvenue - Application Multiservices</title>
-    <style>
+    <title>File d'Attente</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script>
+        var stompClient = null;
 
-    </style>
-</head>
-<body>
-
-<table id="fileAttenteTable">
-    <thead>
-    <tr>
-        <th>Service</th>
-        <th>Agence</th>
-        <th>Numéro en cours</th>
-        <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody></tbody>
-</table>
-<script>
-    function chargerFileAttente() {
-        fetch("/api/files")
-            .then(response => response.json())
-            .then(files => {
-                const tableBody = document.querySelector("#fileAttenteTable tbody");
-                tableBody.innerHTML = ""; // Reset
-
-                files.forEach(file => {
-                    const row = document.createElement("tr");
-
-                    row.innerHTML = `
-                    <td>${file.service.nom}</td>
-                    <td>${file.agence.localisation}</td>
-                    <td>${file.numeroEnCours}</td>
-                    <td>
-                        <button onclick="suivant(${file.id_file_attente})">Suivant</button>
-                        <button onclick="precedent(${file.id_file_attente})">Précédent</button>
-                    </td>
-                `;
-
-                    tableBody.appendChild(row);
+        function connect() {
+            var socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                stompClient.subscribe('/file-attente/1', function (message) {
+                    console.log("Mise à jour reçue !");
+                    location.reload();
                 });
             });
-    }
+        }
 
-    function suivant(idFileAttente) {
-        fetch(`/api/agents/next?idFileAttente=${idFileAttente}`, { method: "POST" })
-            .then(() => chargerFileAttente());
-    }
-
-    function precedent(idFileAttente) {
-        fetch(`/api/agents/previous?idFileAttente=${idFileAttente}`, { method: "POST" })
-            .then(() => chargerFileAttente());
-    }
-
-    // Charger les données au chargement de la page
-    window.onload = chargerFileAttente;
-
-</script>
+        window.onload = connect;
+    </script>
+</head>
+<body>
+<h2>File d'Attente</h2>
+<ul>
+    <%-- Ici, on boucle sur la liste des tickets --%>
+    <c:forEach var="ticket" items="${tickets}">
+        <li>Ticket #${ticket.position} - ${ticket.utilisateur.nom}</li>
+    </c:forEach>
+</ul>
 </body>
 </html>

@@ -1,11 +1,18 @@
 package multiservice.sn.rangmooygaw.entite;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Set;
+import java.util.Collection;
+import java.util.Collections;
 
 @Entity
-public class Utilisateur {
+@Data
+@Table(name = "utilisateur")
+public class Utilisateur implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,26 +22,37 @@ public class Utilisateur {
     private String motDePasse;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Role role; // CLIENT, AGENT, ADMIN
 
-    public <T> Utilisateur(String email, String motDePasse, Set<T> singleton) {
-        this.email = email;
-        this.motDePasse = motDePasse;
+    @OneToOne(mappedBy = "utilisateur", cascade = CascadeType.ALL)
+    private Client client;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singleton(() -> role.name());
     }
 
-    public Utilisateur(Long id, String nom, String email, String motDePasse, Role role) {
-        this.id = id;
-        this.nom = nom;
-        this.email = email;
-        this.motDePasse = motDePasse;
-        this.role = role;
+    @Override
+    public String getUsername() {
+        return email;
     }
 
-    public Utilisateur() {
-
+    @Override
+    public String getPassword() {
+        return motDePasse;
     }
 
-    // Getters & Setters
+    @Override
+    public boolean isAccountNonExpired() { return true; }
+
+    @Override
+    public boolean isAccountNonLocked() { return true; }
+
+    @Override
+    public boolean isCredentialsNonExpired() { return true; }
+
+    @Override
+    public boolean isEnabled() { return true; }
 
     public Long getId() {
         return id;
@@ -72,7 +90,7 @@ public class Utilisateur {
         return role;
     }
 
-    public void setRole(Role role) {
-        this.role = role;
-    }
+//    public void setRole(Role role) {
+//        this.role = role;
+//    }
 }

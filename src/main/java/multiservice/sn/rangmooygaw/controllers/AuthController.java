@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,31 +35,33 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> authenticate(@RequestBody LoginRequest loginRequest) {
         try {
-            System.out.println("Tentative de connexion pour : " + loginRequest.getEmail());
+
+            // Vérifier l'utilisateur en base
+            Utilisateur utilisateur = utilisateurRepository.findByEmail(loginRequest.getEmail())
+                    .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé"));
+
 
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getMotDePasse())
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            System.out.println("Connexion réussie pour : " + loginRequest.getEmail());
-
             String jwt = jwtUtil.generateToken((UserDetails) authentication.getPrincipal());
 
             return ResponseEntity.ok(new AuthResponse(jwt));
 
         } catch (Exception e) {
-            System.out.println("Échec de l'authentification : " + e.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Échec de l'authentification");
         }
     }
 
 
+
     @PostMapping("/register")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> register(@RequestBody Utilisateur utilisateur) {
         utilisateur.setMotDePasse(passwordEncoder.encode(utilisateur.getMotDePasse())); // Hash du mot de passe
+
         utilisateurRepository.save(utilisateur);
         return ResponseEntity.ok("Utilisateur inscrit avec succès !");
     }

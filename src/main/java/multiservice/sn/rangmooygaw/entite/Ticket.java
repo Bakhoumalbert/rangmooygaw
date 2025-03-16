@@ -1,6 +1,8 @@
 package multiservice.sn.rangmooygaw.entite;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -12,7 +14,7 @@ public class Ticket {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "id_client") // Clé étrangère dans la table Ticket
+    @JsonIgnoreProperties("tickets") // 🔥 Ignore la liste des tickets du client
     private Client client;
 
     @ManyToOne
@@ -33,17 +35,31 @@ public class Ticket {
 
     private boolean traite = false; // True si le ticket a été traité
 
-    private LocalDateTime dateCreation = LocalDateTime.now();
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") // 🔥 Format explicite pour JSON
+    private LocalDateTime dateCreation;
+
+    @Column(unique = true)
+    private String numero;
+
+    private String statut;
+
+    @PrePersist
+    public void genererNumero() {
+        this.numero = "T-" + System.currentTimeMillis();
+    }
+
+    // Getters et Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getNumero() { return numero; }
+    public void setNumero(String numero) { this.numero = numero; }
+
+    public String getStatut() { return statut; }
+    public void setStatut(String statut) { this.statut = statut; }
 
     // Getters & Setters
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Client getClient() {
         return client;
@@ -51,6 +67,14 @@ public class Ticket {
 
     public void setClient(Client client) {
         this.client = client;
+    }
+
+    public FileAttente getFileAttente() {
+        return fileAttente;
+    }
+
+    public void setFileAttente(FileAttente fileAttente) {
+        this.fileAttente = fileAttente;
     }
 
     public Services getServices() {

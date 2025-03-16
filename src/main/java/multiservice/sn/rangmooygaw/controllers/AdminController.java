@@ -3,9 +3,12 @@ package multiservice.sn.rangmooygaw.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import multiservice.sn.rangmooygaw.entite.*;
+import multiservice.sn.rangmooygaw.repository.AgenceRepository;
+import multiservice.sn.rangmooygaw.repository.ServiceRepository;
 import multiservice.sn.rangmooygaw.service.*;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,19 +32,23 @@ public class AdminController {
     private ServiceService serviceService;
     @Autowired
     private AgentService agentService;
+    @Autowired
+    private ServiceRepository serviceRepository;
+    @Autowired
+    private AgenceRepository agenceRepository;
 
     // Afficher tous les admins sur une page JSP
     @GetMapping
     public String getAllAdmins(Model model) throws JsonProcessingException {
 
-        return "admin"; // Nom du fichier JSP sans extension (admins.jsp)
+        return "admin/admin"; // Nom du fichier JSP sans extension (admins.jsp)
     }
 
     // Formulaire pour ajouter un admin
     @GetMapping("/new-client")
     public String newAdminForm(Model model) {
         model.addAttribute("admin", new Admin()); // Objet vide pour le formulaire
-        return "client-form"; // client-form.jsp
+        return "admin/client-form"; // client-form.jsp
     }
 
     // Enregistrer un nouvel admin
@@ -55,7 +62,7 @@ public class AdminController {
     @GetMapping("/create-client")
     public String showCreateClientForm(Model model) {
         model.addAttribute("client", new Client());
-        return "create-client"; // Nom de la vue JSP
+        return "admin/create-client"; // Nom de la vue JSP
     }
 
     // Enregistrer un nouveau client
@@ -69,19 +76,28 @@ public class AdminController {
     @GetMapping("/create-agence")
     public String showCreateAgenceForm(Model model) {
         model.addAttribute("agence", new Agence());
-        return "create-agence"; // Nom de la vue JSP
+        model.addAttribute("services", serviceRepository.findAll()); // 🔥 Récupère tous les services disponibles
+        return "admin/create-agence"; // 🔥 Charge la vue JSP
     }
 
+
+    // Enregistrer une agence
     @PostMapping("/create-agence")
-    public String saveAgence(@ModelAttribute("agence") Agence agence, RedirectAttributes redirectAttributes) {
+    public String saveAgence(@ModelAttribute Agence agence,
+                             @RequestParam("servicesId") List<Long> servicesId,
+                             RedirectAttributes redirectAttributes) {
         try {
-            agenceService.saveAgence(agence);
+            List<Services> services = serviceRepository.findAllById(servicesId); // 🔥 Récupérer les services sélectionnés
+            agence.setServices(services); // 🔥 Associer les services à l'agence
+            agenceRepository.save(agence); // 🔥 Sauvegarde de l’agence avec les services associés
+
             redirectAttributes.addFlashAttribute("successMessage", "Agence créée avec succès !");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Erreur lors de la création de l'agence.");
         }
         return "redirect:/admin/agences";
     }
+
 
 
 //    // Enregistrer une nouvelle agence
@@ -106,15 +122,20 @@ public class AdminController {
     // Afficher la page de création d'un service
     @GetMapping("/create-service")
     public String showCreateServiceForm(Model model) {
-        model.addAttribute("service", new Services());
-        return "create-service"; // Nom de la vue JSP
+        model.addAttribute("service", new Services());  // ⚠ Vérifie si la classe est `Service` ou `Services`
+        return "admin/create-service"; // ✅ Correspond au bon chemin dans JSP
     }
 
     // Enregistrer un nouveau service
     @PostMapping("/create-service")
-    public String saveService(@ModelAttribute("service") Services service) {
-        serviceService.saveService(service); // Appel au service pour enregistrer
-        return "redirect:/admin/services"; // Redirige vers la liste des services
+    public String saveService(@ModelAttribute("service") Services service, RedirectAttributes redirectAttributes) {
+        try {
+            serviceService.saveService(service); // ✅ Appel du service
+            redirectAttributes.addFlashAttribute("successMessage", "Service créé avec succès !");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Erreur lors de la création du service.");
+        }
+        return "redirect:/admin/services"; // ✅ Redirection vers la liste des services
     }
 
     // Lister les clients
@@ -132,7 +153,7 @@ public class AdminController {
             e.printStackTrace();
         }
         //model.addAttribute("clients", clients);
-        return "client-list"; // Nom de la vue JSP
+        return "admin/client-list"; // Nom de la vue JSP
     }
 
     // Lister les agences
@@ -144,13 +165,12 @@ public class AdminController {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             String agenceJson = objectMapper.writeValueAsString(agences);
-            System.out.println("liste agence " + agenceJson);
             model.addAttribute("agences", agenceJson);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
 
-        return "list-agences"; // Nom de la vue JSP
+        return "admin/list-agences"; // Nom de la vue JSP
     }
 
     // Lister les services
@@ -166,7 +186,7 @@ public class AdminController {
             e.printStackTrace();
         }
 
-        return "list-services"; // Nom de la vue JSP
+        return "admin/list-services"; // Nom de la vue JSP
     }
 
     // Gestion des agents
@@ -188,7 +208,7 @@ public class AdminController {
             e.printStackTrace();
         }
 
-        return "list-agent"; // Vue JSP pour afficher les agents
+        return "admin/list-agent"; // Vue JSP pour afficher les agents
     }
 
     // Afficher le formulaire de création d'agent
@@ -211,7 +231,7 @@ public class AdminController {
             e.printStackTrace();
         }
 
-        return "create-agent"; // Nom de la vue JSP
+        return "admin/create-agent"; // Nom de la vue JSP
     }
 
     // Enregistrer un nouvel agent
@@ -230,7 +250,7 @@ public class AdminController {
         Optional<Client> client = clientService.getClientById(id);
         if (client != null) {
             model.addAttribute("client", client);
-            return "edit-client"; // Page JSP pour modifier
+            return "admin/edit-client"; // Page JSP pour modifier
         }
         return "redirect:/admin/clients";
     }
@@ -266,36 +286,57 @@ public class AdminController {
             model.addAttribute("agence", agence);
             System.out.println("Agence trouvée : " + agence);
 
-            // Sérialiser l'agence en JSON pour l'affichage côté client
+            // 🔥 Récupérer tous les services pour afficher la liste dans le formulaire
+            List<Services> services = serviceRepository.findAll();
+            model.addAttribute("services", services);
+
+            // 🔥 Sérialiser l'agence en JSON pour l'affichage côté client
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 String agenceJson = objectMapper.writeValueAsString(agence);
-                model.addAttribute("agences", agenceJson);
+                model.addAttribute("agenceJson", agenceJson);
                 System.out.println("Agence JSON : " + agenceJson);
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
 
-            return "edit-agence"; // Page JSP pour modifier l'agence
+            return "admin/edit-agence"; // Page JSP pour modifier l'agence
         } else {
             System.out.println("Agence non trouvée pour l'ID : " + id);
             return "redirect:/admin/agences"; // Rediriger si l'agence n'existe pas
         }
     }
 
+
     // Mettre à jour une agence
     @PostMapping("/update-agence")
-    public String updateAgence(@ModelAttribute Agence agence) {
-        agenceService.saveAgence(agence);
+    public String updateAgence(@ModelAttribute Agence agence,
+                               @RequestParam("servicesId") List<Long> servicesId,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            List<Services> services = serviceRepository.findAllById(servicesId); // 🔥 Récupérer les services sélectionnés
+            agence.setServices(services); // 🔥 Associer les services à l'agence
+            agenceService.saveAgence(agence); // 🔥 Sauvegarde
+
+            redirectAttributes.addFlashAttribute("successMessage", "Agence mise à jour avec succès !");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Erreur lors de la mise à jour.");
+        }
         return "redirect:/admin/agences";
     }
+
 
     // Supprimer une agence
     @DeleteMapping("/delete-agence/{id}")
     public ResponseEntity<Void> deleteAgence(@PathVariable Long id) {
-        agenceService.deleteAgence(id);
-        return ResponseEntity.ok().build();
+        try {
+            agenceService.deleteAgence(id);
+            return ResponseEntity.ok().build(); // ✅ Retourne un succès HTTP 200
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // ❌ Gère les erreurs
+        }
     }
+
 
     /**
      * 🎯 Afficher le formulaire de modification d'un agent
@@ -323,7 +364,7 @@ public class AdminController {
                 e.printStackTrace();
             }
 
-            return "edit-agent"; // Retourne la page JSP de modification
+            return "admin/edit-agent"; // Retourne la page JSP de modification
         } else {
             return "redirect:/admin/agents"; // Redirige si l'agent n'existe pas
         }
@@ -367,7 +408,7 @@ public class AdminController {
                 e.printStackTrace();
             }
 
-            return "edit-service"; // Page JSP pour modifier l'agence
+            return "admin/edit-service"; // Page JSP pour modifier l'agence
         } else {
             System.out.println("Service non trouvée pour l'ID : " + id);
             return "redirect:/admin/services"; // Rediriger si le service n'existe pas

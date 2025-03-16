@@ -1,4 +1,6 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="multiservice.sn.rangmooygaw.entite.Services" %>
+    <%@ page import="java.util.List" %>
+    <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -32,7 +34,7 @@
             margin-bottom: 5px;
         }
 
-        input[type="text"] {
+        input[type="text"], select {
             width: 100%;
             padding: 10px;
             margin-bottom: 20px;
@@ -63,9 +65,18 @@
     <h1>Créer une Agence</h1>
     <form action="/admin/create-agence" method="post">
         <label for="nom">Nom de l'agence :</label>
-        <input type="text" id="nom" name="nom" placeholder="Ex: Orange agence" required>
+        <input type="text" id="nom" name="nom" placeholder="Ex: Orange Agence" required>
+
         <label for="localisation">Localisation :</label>
         <input type="text" id="localisation" name="localisation" placeholder="Ex : Dakar" required>
+
+        <label for="services">Choisir les services proposés :</label>
+        <select id="services" name="servicesId" multiple>
+            <% for (Services service : (List<Services>) request.getAttribute("services")) { %>
+            <option value="<%= service.getIdService() %>"><%= service.getNom() %></option>
+            <% } %>
+        </select>
+
         <button type="submit">Enregistrer</button>
     </form>
 </div>

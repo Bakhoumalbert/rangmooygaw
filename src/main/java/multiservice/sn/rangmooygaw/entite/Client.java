@@ -1,5 +1,6 @@
 package multiservice.sn.rangmooygaw.entite;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -17,8 +18,14 @@ public class Client {
     private String telephone;
 
 
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Ticket> tickets = new ArrayList<>();
+    @JsonIgnore // 🔥 Ignore la liste des tickets lors de la conversion JSON
+    @OneToMany(mappedBy = "client", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Ticket> tickets;
+
+
+    @OneToOne
+    @JoinColumn(name = "id_utilisateur")
+    private Utilisateur utilisateur;
 
 
     // Getters et setters
@@ -69,6 +76,10 @@ public class Client {
 
     public void setTickets(List<Ticket> tickets) {
         this.tickets = tickets;
+    }
+
+    public void setUtilisateur(Utilisateur utilisateur) {
+        this.utilisateur = utilisateur;
     }
 }
 

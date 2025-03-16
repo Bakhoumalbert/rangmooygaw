@@ -37,11 +37,16 @@ public class AgenceService {
     /**
      * Supprime une agence après vérification.
      */
-    public boolean deleteAgence(Long id) {
+    public void deleteAgence(Long id) {
         if (agenceRepository.existsById(id)) {
-            agenceRepository.deleteById(id);
-            return true;
+            agenceRepository.deleteById(id); // ✅ Supprime l'agence
+        } else {
+            throw new IllegalArgumentException("Agence introuvable !");
         }
-        return false;
     }
+
+    public Optional<Agence> findByNom(String nom) {
+        return agenceRepository.findByNom(nom);
+    }
+
 }

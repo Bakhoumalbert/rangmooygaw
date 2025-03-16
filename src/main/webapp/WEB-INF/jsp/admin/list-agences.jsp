@@ -156,24 +156,31 @@
                 editButton.textContent = "Modifier";
                 editButton.classList.add("edit-btn");
                 editButton.onclick = function () {
-                    window.location.href = "/admin/edit-agence/" + agence.id_agence;
+                    window.location.href = "/admin/edit-agence/" + agence.idAgence;
                 };
 
-                // Bouton Supprimer
                 const deleteButton = document.createElement("button");
                 deleteButton.textContent = "Supprimer";
                 deleteButton.classList.add("delete-btn");
-                deleteButton.onclick = function () {
+
+                deleteButton.onclick = async function () {
                     if (confirm("Voulez-vous vraiment supprimer cette agence ?")) {
-                        fetch("/admin/delete-agence/" + agence.id_agence, { method: "DELETE" })
-                            .then(response => {
-                                if (response.ok) {
-                                    row.remove();
-                                } else {
-                                    alert("Erreur lors de la suppression.");
-                                }
-                            })
-                            .catch(error => console.error("Erreur :", error));
+                        try {
+                            const response = await fetch("/admin/delete-agence/"+ agence.idAgence, {
+                                method: "DELETE",
+                                headers: { "Content-Type": "application/json" }
+                            });
+
+                            if (response.ok) {
+                                alert("Agence supprimée avec succès !");
+                                location.reload(); // 🔄 Recharge la page après suppression
+                            } else {
+                                alert("Erreur lors de la suppression !");
+                            }
+                        } catch (error) {
+                            console.error("Erreur :", error);
+                            alert("Une erreur est survenue !");
+                        }
                     }
                 };
 

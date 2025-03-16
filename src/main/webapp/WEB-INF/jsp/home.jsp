@@ -110,8 +110,9 @@
 <nav>
     <a href="/admin">Dashboard Admin</a>
     <a href="/clients">Portail Client</a>
-    <a href="/services">Nos Services</a>
+    <a href="/service">Nos Services</a>
     <a href="/contact">Contact</a>
+    <a href="/logout">Déconnexion</a>
 </nav>
 
 <div class="container">
@@ -121,7 +122,7 @@
             Nous vous offrons une expérience rapide et efficace pour gérer vos interactions avec différents services,
             que ce soit pour le paiement des factures, la gestion des files d'attente ou bien plus encore.
         </p>
-        <a href="/client">Accéder au portail client</a>
+        <a href="${pageContext.request.contextPath}/client">Accéder au portail client</a>
     </div>
 </div>
 

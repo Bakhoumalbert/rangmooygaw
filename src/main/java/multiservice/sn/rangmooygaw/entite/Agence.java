@@ -31,11 +31,11 @@ public class Agence {
 
 
     // ✅ Getters et Setters
-    public Long getId_agence() {
+    public Long getIdAgence() {
         return idAgence;
     }
 
-    public void setId_agence(Long id_agence) {
+    public void setIdAgence(Long id_agence) {
         this.idAgence = id_agence;
     }
 
