@@ -64,6 +64,26 @@ public class AgentController {
             redirectAttributes.addFlashAttribute("errorMessage", "Ticket introuvable.");
         }
 
-        return "redirect:/agent/dashboard"; // ✅ Rediriger après le traitement
+        return "redirect:/agent"; // ✅ Rediriger après le traitement
     }
+
+    @PostMapping("/ticket/supprimer")
+    public String supprimerTicketTraite(@RequestParam("ticketId") Long ticketId, RedirectAttributes redirectAttributes) {
+        Optional<Ticket> ticketOpt = ticketRepository.findById(ticketId);
+
+        if (ticketOpt.isPresent()) {
+            Ticket ticket = ticketOpt.get();
+            if ("TRAITÉ".equals(ticket.getStatut())) {
+                ticketRepository.delete(ticket);
+                redirectAttributes.addFlashAttribute("successMessage", "✅ Ticket supprimé avec succès.");
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "❌ Seuls les tickets TRAITÉS peuvent être supprimés.");
+            }
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "⚠️ Ticket introuvable.");
+        }
+
+        return "redirect:/agent"; // Redirige vers le tableau de bord
+    }
+
 }

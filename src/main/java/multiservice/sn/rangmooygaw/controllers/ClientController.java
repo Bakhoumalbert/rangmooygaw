@@ -16,10 +16,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/client")
@@ -58,16 +56,56 @@ public class ClientController {
         System.out.println("Client trouvé : " + client.getId());
 
         // ✅ Récupérer les tickets associés
-        List<Ticket> tickets = ticketRepository.findByClient(client);
-        System.out.println("Nombre de tickets trouvés : " + tickets.size());
+//        List<Ticket> tickets = ticketRepository.findByClient(client);
+//        System.out.println("Nombre de tickets trouvés : " + tickets.size());
+//
+//        // Convertir les listes en JSON
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        objectMapper.registerModule(new JavaTimeModule());
+//
+//        String ticketJson = objectMapper.writeValueAsString(tickets);
+//
+//        model.addAttribute("ticketJson", ticketJson);
 
-        // Convertir les listes en JSON
+        // Tous les tickets du client
+        List<Ticket> tickets = ticketRepository.findByClient(client);
+
+// Tous les tickets en attente tous clients confondus (même service)
+        List<Ticket> allWaitingTickets = ticketRepository.findByStatut("EN ATTENTE");
+
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
 
-        String ticketJson = objectMapper.writeValueAsString(tickets);
+        List<Map<String, Object>> ticketDTOList = new ArrayList<>();
 
+        for (Ticket ticket : tickets) {
+            Map<String, Object> ticketMap = new HashMap<>();
+            ticketMap.put("numero", ticket.getNumero());
+            ticketMap.put("dateCreation", ticket.getDateCreation().toString());
+            ticketMap.put("statut", ticket.getStatut());
+
+            // On met aussi le nom du service dans une clé "service"
+            Map<String, String> serviceMap = new HashMap<>();
+            serviceMap.put("nom", ticket.getService().getNom());
+            ticketMap.put("service", serviceMap);
+
+            if ("EN ATTENTE".equals(ticket.getStatut())) {
+                // On filtre par service pour ce ticket-là
+                List<Ticket> attenteMemeService = allWaitingTickets.stream()
+                        .filter(t -> t.getService().getIdService().equals(ticket.getService().getIdService()))
+                        .collect(Collectors.toList());
+
+                int position = getPositionInQueue(attenteMemeService, ticket);
+                ticketMap.put("position", position);
+            }
+
+            ticketDTOList.add(ticketMap);
+        }
+
+// Conversion finale en JSON
+        String ticketJson = objectMapper.writeValueAsString(ticketDTOList);
         model.addAttribute("ticketJson", ticketJson);
+
 
         return "client/client";
     }
@@ -168,6 +206,19 @@ public class ClientController {
         }
 
         return "client/tickets"; // Afficher la page JSP correspondante
+    }
+
+    private int getPositionInQueue(List<Ticket> enAttente, Ticket ticketClient) {
+        // Trier les tickets par date de création croissante
+        enAttente.sort(Comparator.comparing(Ticket::getDateCreation));
+
+        // Retourner la position (1-based index)
+        for (int i = 0; i < enAttente.size(); i++) {
+            if (enAttente.get(i).getId().equals(ticketClient.getId())) {
+                return i + 1;
+            }
+        }
+        return -1; // Ticket non trouvé (erreur logique normalement)
     }
 
 }

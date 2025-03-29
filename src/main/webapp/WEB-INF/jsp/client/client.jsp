@@ -65,7 +65,7 @@
 <p>Accédez à vos services ici.</p>
 
 <!-- ✅ Lien pour accéder à la file d'attente -->
-<a href="/client/file-attente" class="buton">Accéder au file d'attente</a>
+<a href="/client/file-attente" class="buton">Prendre un ticket</a>
 
 <h2>Mes Tickets</h2>
 
@@ -77,6 +77,7 @@
         <th>Date</th>
         <th>Service</th>
         <th>Statut</th>
+        <th>Position</th>
     </tr>
     </thead>
     <tbody id="ticketTableBody">
@@ -115,12 +116,23 @@
             cellStatut.textContent = ticket.statut;
             cellStatut.classList.add("status", ticket.statut === "EN ATTENTE" ? "pending" : "done");
 
+            let cellPosition = document.createElement("td");
 
+            if (ticket.statut === "EN ATTENTE") {
+                cellPosition.textContent = ticket.position ? ticket.position : "-";
+            } else {
+                cellPosition.textContent = "-";
+            }
+
+            let cellDernierTraite = document.createElement("td");
+            cellDernierTraite.textContent = ticket.dernierTraite ? ticket.dernierTraite : "-";
 
             row.appendChild(cellNumero);
             row.appendChild(cellDate);
             row.appendChild(serviceCell);
             row.appendChild(cellStatut);
+            row.appendChild(cellPosition);
+
 
             tableBody.appendChild(row);
         });

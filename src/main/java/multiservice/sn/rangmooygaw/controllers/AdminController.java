@@ -2,9 +2,11 @@ package multiservice.sn.rangmooygaw.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import multiservice.sn.rangmooygaw.entite.*;
 import multiservice.sn.rangmooygaw.repository.AgenceRepository;
 import multiservice.sn.rangmooygaw.repository.ServiceRepository;
+import multiservice.sn.rangmooygaw.repository.TicketRepository;
 import multiservice.sn.rangmooygaw.service.*;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +17,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
@@ -36,13 +41,39 @@ public class AdminController {
     private ServiceRepository serviceRepository;
     @Autowired
     private AgenceRepository agenceRepository;
+    @Autowired
+    private TicketRepository ticketRepository;
+
+    @GetMapping
+    public String afficherFileAdmin(Model model) throws JsonProcessingException {
+        List<Ticket> tickets = ticketRepository.findAll();
+
+        List<Map<String, Object>> fileAttente = tickets.stream()
+                .filter(t -> t.getService() != null && t.getAgence() != null)
+                .map(t -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("service", t.getService().getNom());
+                    map.put("agence", t.getAgence().getNom());
+                    map.put("numero", t.getNumero());
+                    map.put("dateCreation", t.getDateCreation().toString());
+                    map.put("statut", t.getStatut());
+                    return map;
+                })
+                .collect(Collectors.toList());
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        String fileJson = mapper.writeValueAsString(fileAttente);
+
+        model.addAttribute("fileJson", fileJson);
+        return "admin/admin"; // ➜ dashboard.jsp
+    }
 
     // Afficher tous les admins sur une page JSP
-    @GetMapping
-    public String getAllAdmins(Model model) throws JsonProcessingException {
-
-        return "admin/admin"; // Nom du fichier JSP sans extension (admins.jsp)
-    }
+//    @GetMapping
+//    public String getAllAdmins(Model model) throws JsonProcessingException {
+//        return "admin/admin"; // Nom du fichier JSP sans extension (admins.jsp)
+//    }
 
     // Formulaire pour ajouter un admin
     @GetMapping("/new-client")
@@ -428,4 +459,5 @@ public class AdminController {
         serviceService.deleteService(id);
         return ResponseEntity.ok().build();
     }
+
 }

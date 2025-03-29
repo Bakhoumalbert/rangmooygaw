@@ -127,6 +127,7 @@
         <th>Numéro de Ticket</th>
         <th>Statut</th>
         <th>Action</th>
+        <th>Suppression</th>
     </tr>
     </thead>
     <tbody id="ticketTableBody">
@@ -138,84 +139,86 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // 🔥 Récupération des tickets envoyés par le backend en JSON
         const tickets = JSON.parse('${ticketsJson}');
-
-        console.log("Tickets chargés :", tickets);
-
         const tableBody = document.getElementById("ticketTableBody");
 
-        // Vérifier si des tickets existent
         if (tickets.length === 0) {
-            tableBody.innerHTML = "<tr><td colspan='3'>Aucun ticket disponible</td></tr>";
+            tableBody.innerHTML = "<tr><td colspan='4'>Aucun ticket disponible</td></tr>";
             return;
         }
 
-        // 🔁 Remplissage dynamique du tableau
         tickets.forEach(ticket => {
-            let row = document.createElement("tr"); // ✅ Création d'une ligne
+            const row = document.createElement("tr");
 
-            let numCell = document.createElement("td");
-            numCell.textContent = ticket.numero; // 🔥 Numéro du ticket
+            // 📌 Numéro de ticket
+            const numCell = document.createElement("td");
+            numCell.textContent = ticket.numero;
 
-            let statusCell = document.createElement("td");
-            statusCell.textContent = ticket.statut; // 🔥 Statut du ticket
+            // 📌 Statut
+            const statusCell = document.createElement("td");
+            statusCell.textContent = ticket.statut;
 
-            // 🎨 Appliquer un style en fonction du statut
             if (ticket.statut === "TRAITÉ") {
-                statusCell.style.color = "#28a745"; // Vert
-                statusCell.style.fontWeight = "bold";
+                statusCell.classList.add("status-traité");
             } else if (ticket.statut === "EN ATTENTE") {
-                statusCell.style.color = "#FFA500"; // Orange
-                statusCell.style.fontWeight = "bold";
+                statusCell.classList.add("status-attente");
             }
 
-            let actionCell = document.createElement("td"); // ✅ Création de la cellule Action
+            // 📌 Bouton Traiter
+            const actionCell = document.createElement("td");
+            const formTraiter = document.createElement("form");
+            formTraiter.action = "/agent/traiter-ticket";
+            formTraiter.method = "post";
 
-            let form = document.createElement("form");
-            form.action = "/agent/traiter-ticket"; // 🚀 URL correcte
-            form.method = "post"; // 🛑 Requête POST
+            const hiddenId = document.createElement("input");
+            hiddenId.type = "hidden";
+            hiddenId.name = "idTicket";
+            hiddenId.value = ticket.id;
 
-            let inputHidden = document.createElement("input");
-            inputHidden.type = "hidden";
-            inputHidden.name = "idTicket"; // 🔥 Correspond à @RequestParam("idTicket")
-            inputHidden.value = ticket.id; // ✅ Assure-toi que ticket.id est défini
+            const traiterButton = document.createElement("button");
+            traiterButton.type = "submit";
+            traiterButton.textContent = "Traiter";
 
-            let button = document.createElement("button");
-            button.type = "submit";
-            button.textContent = "Traiter";
-
-            // 🎨 Style du bouton en fonction du statut
             if (ticket.statut === "TRAITÉ") {
-                button.style.backgroundColor = "#6c757d"; // Gris (désactivé)
-                button.style.cursor = "not-allowed";
-                button.disabled = true; // Désactiver le bouton
-            } else if (ticket.statut === "EN ATTENTE") {
-                button.style.backgroundColor = "#28a745"; // Vert (actionnable)
-                button.style.cursor = "pointer";
+                traiterButton.disabled = true;
             }
 
-            // 🔍 Vérification
-            console.log("Ajout du ticket :", ticket.id);
+            formTraiter.appendChild(hiddenId);
+            formTraiter.appendChild(traiterButton);
+            actionCell.appendChild(formTraiter);
 
-            form.appendChild(inputHidden);
-            form.appendChild(button);
-            actionCell.appendChild(form); // ✅ Maintenant `actionCell` existe
+            // 📌 Bouton Supprimer
+            const deleteCell = document.createElement("td");
+            if (ticket.statut === "TRAITÉ") {
+                const formSupprimer = document.createElement("form");
+                formSupprimer.action = "/agent/ticket/supprimer";
+                formSupprimer.method = "post";
+                formSupprimer.onsubmit = () => confirm("Supprimer ce ticket ?");
 
-            // Ajout des cellules à la ligne
+                const hiddenDeleteId = document.createElement("input");
+                hiddenDeleteId.type = "hidden";
+                hiddenDeleteId.name = "ticketId";
+                hiddenDeleteId.value = ticket.id;
+
+                const deleteButton = document.createElement("button");
+                deleteButton.type = "submit";
+                deleteButton.textContent = "Supprimer";
+                deleteButton.style.backgroundColor = "#dc3545";
+                deleteButton.style.marginLeft = "5px";
+
+                formSupprimer.appendChild(hiddenDeleteId);
+                formSupprimer.appendChild(deleteButton);
+                deleteCell.appendChild(formSupprimer);
+            } else {
+                deleteCell.textContent = "-";
+            }
+
             row.appendChild(numCell);
             row.appendChild(statusCell);
             row.appendChild(actionCell);
-
-            // Ajout de la ligne au tableau
+            row.appendChild(deleteCell);
             tableBody.appendChild(row);
-
-            // 🔥 Vérifier si le formulaire est soumis
-            form.addEventListener("submit", function(event) {
-                console.log("Formulaire soumis avec ID Ticket :", inputHidden.value);
-            });
         });
-
     });
 </script>
 
